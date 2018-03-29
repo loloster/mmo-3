@@ -121,6 +121,9 @@ void setup() {
   test(); // hardware test mode
  
   start_dac();
+
+  Serial.begin(9600);
+  Serial.println("Hey! Hey!");
   
   while (true) main_loop(); // faster than arduino loop
 }

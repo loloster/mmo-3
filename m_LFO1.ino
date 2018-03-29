@@ -87,6 +87,8 @@ inline void LFO1_modulation() {
   #ifdef LFO_out
     analog_out_1((tmpS+(1<<15))<<16);
   #endif
+  //Serial.write(0xF1);
+  //Serial.write(LFO1MOD_increment);
 }
 
 inline void LFO1_audio() {
