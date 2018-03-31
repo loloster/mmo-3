@@ -79,6 +79,9 @@ uint32_t envelope;
 // DAC
 uint32_t dac_on;
 
+// Loop Counter
+uint32_t loopc;
+
 void setup() {
   uint32_t i;
 
@@ -151,7 +154,17 @@ inline void main_loop() { // as fast as possible
   #endif  
   analog_in();
   MIDI_in();
+
   LFO1_modulation();
+  //if (Serial.availableForWrite()){ 
+  // Serial.print("LFO1_phase:");
+  // Serial.println(LFO1_phase);
+  //}
+  //if (Serial.availableForWrite()){ 
+  // Serial.print("LFO1_increment:");
+  // Serial.println(LFO1_increment);
+  //}
+
   LFO2_modulation();
   LFO3_modulation();
   PORTAMENTO_update();
@@ -161,6 +174,46 @@ inline void main_loop() { // as fast as possible
   // VCA_update(); // idem
   // joystick();   // idem
   update_leds(); // gate and midi leds
+
+  if (!(loopc++ < 500)){
+    loopc=0;
+    if (Serial.availableForWrite()){
+      //Serial.print("VCO1_FQ:");
+      //Serial.println(adc_value16[VCO1_FQ]);
+      Serial.print("mod_VCO1:");
+      Serial.println(modulation_data[mod_VCO1]);
+    //}
+    //if (Serial.availableForWrite()){
+      //Serial.print("VCO2_FQ:");
+      //Serial.println(adc_value16[VCO2_FQ]);
+      //Serial.print("mod_VCO2:");
+      //Serial.println(modulation_data[mod_VCO2]);
+    //}
+    //if (Serial.availableForWrite()){
+      //Serial.print("VCO3_FQ:");
+      //Serial.println(adc_value16[VCO3_FQ]);
+      //Serial.print("mod_VCO3:");
+      //Serial.println(modulation_data[mod_VCO3]);
+    //}
+    //if (Serial.availableForWrite()){
+      //Serial.print("LFO1_FQ:");
+      //Serial.println(adc_value16[LFO1_FQ]);
+      //Serial.print("mod_LFO1:");
+      //Serial.println(modulation_data[mod_LFO1]);
+    //}
+    //if (Serial.availableForWrite()){
+      //Serial.print("LFO2_FQ:");
+      //Serial.println(adc_value16[LFO2_1]);
+      //Serial.print("mod_LFO2:");
+      //Serial.println(modulation_data[mod_LFO2]);
+    //}
+    //if (Serial.availableForWrite()){
+      //Serial.print("LFO3_FQ:");
+      //Serial.println(adc_value16[LFO3_1]);
+      //Serial.print("mod_LFO3:");
+      //Serial.println(modulation_data[mod_LFO3]);
+    }
+}
   
   //analog_out_1((modulation_data[modulation_index[index_VCO1_MOD1]]<<16)^0x80000000);
   //analog_out_2((modulation_data_AM[modulation_index[index_VCO1_MOD1]]<<16));

@@ -51,6 +51,15 @@ inline void LFO1_freq() { // TODO latter : tester ce qui est le plus rapide : LF
   offset_signed *= offset_gain; // 15 + 15 + sign
   offset_signed >>= 15; 
   offset_signed_LFO1 = offset_signed;
+
+  //if (Serial.availableForWrite()){
+   //Serial.print("LFO1:I");
+   //Serial.write(LFO1_increment);
+   //Serial.print(",G");
+   //Serial.print(gain_LFO1);
+   //Serial.print(",D");
+   //Serial.println(distortion_LFO1);
+  //}
 }
 
 inline void LFO1_modulation() {
@@ -89,6 +98,11 @@ inline void LFO1_modulation() {
   #endif
   //Serial.write(0xF1);
   //Serial.write(LFO1MOD_increment);
+  //if (Serial.availableForWrite()){
+  // Serial.print("LFO1MOD_increment:");
+  // Serial.println(LFO1MOD_increment);
+  //}
+
 }
 
 inline void LFO1_audio() {

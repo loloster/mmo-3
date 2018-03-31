@@ -711,6 +711,17 @@ inline void keyboard_in() {
     }
     
     KEY_old = KEY;
+
+    //Serial.print("ONote/Note:");
+    //Serial.print(KEY_old);
+    Serial.print("Note:");
+    Serial.println(NOTE_ON);
+/*    if (Serial.availableForWrite()){
+     Serial.print("VCO1_FQ");
+     Serial.println(adc_value16[VCO1_FQ]);
+    }
+*/
+    
     break;
   }
 }
@@ -719,6 +730,8 @@ inline void PORTAMENTO_update() {
   uint32_t tmp32;
   tmp32 = adc_value16[PORTAMENTO_VALUE];
   portamento = (table_CV2freq[0x350-(tmp32>>7)]);
+  //Serial.write(0xA0);
+  //Serial.write(portamento);
 }
 
 inline void PORTAMENTO() {

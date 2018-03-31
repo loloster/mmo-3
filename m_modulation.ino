@@ -79,22 +79,23 @@ inline void joystick() {
   JYp = (0x7000 > joystickY)? (0x7000 - joystickY): 0;
   JYm = (joystickY > 0x9000)? (joystickY - 0x9000): 0;      
 
-  if (JXp) {
-   Serial.write(0xA0);
-   Serial.write(JXp);
-  }
- 
-  if (JXm) {
-   Serial.write(0xA1);
-   Serial.write(JXm);
-  }
-  if (JYp) {
-   Serial.write(0xA2);
-   Serial.write(JYp);
-  }
-  if (JYm) {
-   Serial.write(0xA3);
-   Serial.write(JYm);
+  if (Serial.availableForWrite()){
+   if (JXp) {
+    Serial.write("X");
+    //Serial.println(JXp);
+   }
+   if (JXm) {
+    Serial.write("x");
+    //Serial.println(JXm);
+   }
+   if (JYp) {
+    Serial.write("Y");
+    //Serial.println(JYp);
+   }
+   if (JYm) {
+    Serial.write("y");
+    //Serial.println(JYm);
+   }
   }
 }
 

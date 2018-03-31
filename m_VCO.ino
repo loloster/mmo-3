@@ -129,6 +129,9 @@ inline void VCO1_freq_1() { // in analogue loop (==DATA / 30)
   freq1_old = tmp;
   tmp *= 1536;
   tmp += (1<<26);
+  //Serial.write(0xF1);
+  //Serial.write(tmp);
+  //Serial.write(0x0);
   freq1 = tmp;
 }
 

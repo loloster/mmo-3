@@ -111,7 +111,7 @@ enum modulation_adresse {
   index_Xp,
   index_Ym,
   index_Yp,
-  index_0, // not ued, just to have 16 value in this list
+  index_0, // not used, just to have 16 value in this list
   index_00,
   index_000
 };
