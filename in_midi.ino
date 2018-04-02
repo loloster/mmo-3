@@ -91,7 +91,10 @@ inline void MIDI_in() { // the main loop is faster than midi message, no need to
         {  
           MIDI_gate = 1;
           MIDI_pitch = MIDI_data1;
-          
+          #ifdef serialout
+          //Serial.print("MIDI_pitch:");
+          //Serial.println(MIDI_pitch);
+          #endif
           KEY_LOCAL_goal = (16+MIDI_pitch) << (2+18);
         }
         #ifdef MIDI_omni

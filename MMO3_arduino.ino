@@ -1,3 +1,4 @@
+
 // MMO-3
 // based on arduino duo
 //
@@ -20,6 +21,8 @@
 // --------------------------------------------------------------------------
 
 #include <Arduino.h>
+//#include <SPI.h>
+
 #include "ARS.h"
 #include "conf.h"
 
@@ -79,8 +82,13 @@ uint32_t envelope;
 // DAC
 uint32_t dac_on;
 
-// Loop Counter
-uint32_t loopc;
+#ifdef serialout
+  // Loop Counter
+  uint32_t loopc;
+
+  // 2nd Loop Counter
+  uint8_t compteur_cc = 0;
+#endif
 
 void setup() {
   uint32_t i;
@@ -125,15 +133,31 @@ void setup() {
  
   start_dac();
 
-  Serial.begin(9600);
-  Serial.println("Hey! Hey!");
-  
+  #ifdef serialout
+    //Serial.begin(9600);
+    Serial.begin(57600);
+  //SPI.begin(4);
+    Serial.println("Hey! Hey!");
+    Serial.println("MMO-3!");
+    /*Serial.write((byte)0x00);
+    Serial.write((byte)0xFF);
+    Serial.write("M");
+    Serial.write("M");
+    Serial.write("O");
+    Serial.write("-");
+    Serial.write("3");
+    Serial.write((byte)0x00);
+    */
+   #endif
+        
   while (true) main_loop(); // faster than arduino loop
 }
 
 inline void main_loop() { // as fast as possible
   uint32_t compteur, tmpU32;
   int32_t tmp32;
+  
+  //int incomingByte = 0;   // for incoming serial data  
   
   #ifdef syncro_out
     test2_on();
@@ -156,13 +180,13 @@ inline void main_loop() { // as fast as possible
   MIDI_in();
 
   LFO1_modulation();
-  //if (Serial.availableForWrite()){ 
+  //if (//Serial.availableForWrite()){ 
   // Serial.print("LFO1_phase:");
-  // Serial.println(LFO1_phase);
+  // //Serial.println(LFO1_phase);
   //}
-  //if (Serial.availableForWrite()){ 
-  // Serial.print("LFO1_increment:");
-  // Serial.println(LFO1_increment);
+  //if (//Serial.availableForWrite()){ 
+  // //Serial.print("LFO1_increment:");
+  // //Serial.println(LFO1_increment);
   //}
 
   LFO2_modulation();
@@ -175,45 +199,196 @@ inline void main_loop() { // as fast as possible
   // joystick();   // idem
   update_leds(); // gate and midi leds
 
-  if (!(loopc++ < 500)){
+  #ifdef serialout
+  if (!(loopc++ < 1)){
     loopc=0;
-    if (Serial.availableForWrite()){
+    //if (Serial.available() > 0) {
+     // read the incoming byte:
+     //incomingByte = Serial.read();
+                // say what you got:
+       //         Serial.print("I received: ");
+       //         Serial.println(incomingByte, DEC);
+//    if (Serial.availableForWrite()){
+      switch ((compteur_cc++ % 64)) {
+/*        case 0:
+        Serial.write((byte)0xFF);
+        Serial.write((byte)0x00);
+        Serial.write((uint8_t)(adc_value16[VCO1_FQ] >> 8));
+        Serial.write((uint8_t)(adc_value16[VCO1_FQ] & 0xFF));
+        break;
+        case 5:
+        Serial.write((byte)0xFF);
+        Serial.write((byte)0x05);
+        Serial.write((uint8_t)(adc_value16[VCO2_FQ] >> 8));
+        Serial.write((uint8_t)(adc_value16[VCO2_FQ] & 0xFF));
+        break;
+        case 9:
+        Serial.write((byte)0xFF);
+        Serial.write((byte)0x09);
+        Serial.write((uint8_t)(adc_value16[VCO3_FQ] >> 8));
+        Serial.write((uint8_t)(adc_value16[VCO3_FQ] & 0xFF));
+        break;
+*/
+        case 13:
+        /*Serial.write((byte)0xFF);
+        Serial.write((byte)13);
+        Serial.write((uint8_t)(adc_value16[LFO1_FQ] >> 8));
+        Serial.write((uint8_t)(adc_value16[LFO1_FQ] & 0xFF));
+        */
+        SerialUSB.print("LFO1_FQ:");
+        SerialUSB.print(adc_value16[LFO1_FQ]);
+        SerialUSB.print("/");
+        SerialUSB.print("LFO1_WF:");
+        SerialUSB.print(adc_value16[LFO1_WF]);
+        SerialUSB.print("/");
+        SerialUSB.print("LFO1_SYM:");
+        SerialUSB.print(adc_value16[LFO1_SYM]);
+        SerialUSB.print("/");
+        SerialUSB.print("mod_LFO1:");
+        SerialUSB.print(modulation_data[mod_LFO1]);
+        break;
+      
+        case 17:
+        /*
+        Serial.write((byte)0xFF);
+        Serial.write((byte)17);
+        Serial.write((uint8_t)(adc_value16[LFO2_1] >> 8));
+        Serial.write((uint8_t)(adc_value16[LFO2_1] & 0xFF));
+        Serial.write((uint8_t)(modulation_data[mod_LFO2] >> 8));
+        Serial.write((uint8_t)(modulation_data[mod_LFO2] & 0xFF));
+        */
+        SerialUSB.print("LFO2_FQ1:");
+        SerialUSB.print(adc_value16[LFO2_1]);
+        SerialUSB.print("/");
+        SerialUSB.print("LFO2_FQ2:");
+        SerialUSB.print(adc_value16[LFO2_2]);
+        SerialUSB.print("/");
+        SerialUSB.print("LFO2_MOD:");
+        SerialUSB.print(adc_value16[LFO2_3]);
+        SerialUSB.print("/");
+        SerialUSB.print("mod_LFO2:");
+        SerialUSB.print(modulation_data[mod_LFO2]);
+        break;
+        
+        case 21:
+        /*
+        Serial.write((byte)0xFF);
+        Serial.write((byte)21);
+        Serial.write((uint8_t)(adc_value16[LFO3_1] >> 8));
+        Serial.write((uint8_t)(adc_value16[LFO3_1] & 0xFF));
+        */
+        SerialUSB.print("LFO3_FQ:");
+        SerialUSB.print(adc_value16[LFO3_1]);
+        SerialUSB.print("/");
+        SerialUSB.print("LFO3_PRM1:");
+        SerialUSB.print(adc_value16[LFO3_2]);
+        SerialUSB.print("/");
+        SerialUSB.print("LFO3_PRM2:");
+        SerialUSB.print(adc_value16[LFO3_3]);
+        SerialUSB.print("/");
+        SerialUSB.print("mod_LFO3:");
+        SerialUSB.println(modulation_data[mod_LFO3]);
+        break;
+        
+        
+/*        
+        case 32:
+        Serial.write((byte)0xFF);
+        Serial.write((byte)32);
+        Serial.write((uint8_t)(KEY_LOCAL_goal >> 24));
+        Serial.write((uint8_t)(KEY_LOCAL_goal >> 16));
+        //Serial.write((uint8_t)(KEY_LOCAL_goal >> 8));
+        //Serial.write((uint8_t)(KEY_LOCAL_goal & 0xFF));
+        break;
+*/
+//        case 33:
+//        Serial.write((byte)0xFF);
+//        Serial.write((byte)0x33);
+//        Serial.write((uint8_t)(modulation_data[mod_LFO1] >> 8));
+//        Serial.write((uint8_t)(modulation_data[mod_LFO1] & 0xFF));
+//        Serial.print("mod_LFO1:");
+//        Serial.println(modulation_data[mod_LFO1]);
+//        break;
+
+/*        case 34:
+        Serial.write((byte)0xFF);
+        Serial.write((byte)34);
+        Serial.write((uint8_t)(modulation_data[mod_LFO2] >> 8));
+        Serial.write((uint8_t)(modulation_data[mod_LFO2] & 0xFF));
+        break;
+        case 35:
+        Serial.write((byte)0xFF);
+        Serial.write((byte)35);
+        Serial.write((uint8_t)(modulation_data[mod_LFO3] >> 8));
+        Serial.write((uint8_t)(modulation_data[mod_LFO3] & 0xFF));
+        break;
+*/        //default:
+        //Serial.write((byte)0x00);
+        //Serial.write((byte)0x00);
+        //Serial.write((byte)0x00);
+        //Serial.write((byte)0x00);
+      }
+      //SPI.transfer(4, 0xF0, SPI_CONTINUE);
+      //SPI.transfer(adc_value16[VCO1_FQ]);
+      //SPI.transfer(4, 0xF0);
+
+      //Serial.write("O1");
+      //Serial.write((uint8_t)(adc_value16[VCO1_FQ] & 0xFF));
+      //Serial.write((uint8_t)(adc_value16[VCO1_FQ] >> 8));
       //Serial.print("VCO1_FQ:");
       //Serial.println(adc_value16[VCO1_FQ]);
-      Serial.print("mod_VCO1:");
-      Serial.println(modulation_data[mod_VCO1]);
+      //Serial.print("mod_VCO1:");
+      //Serial.println(modulation_data[mod_VCO1]);
+      //Serial.print("KEY_LOCAL_goal:");
+      //Serial.println(KEY_LOCAL_goal);
     //}
-    //if (Serial.availableForWrite()){
-      //Serial.print("VCO2_FQ:");
-      //Serial.println(adc_value16[VCO2_FQ]);
-      //Serial.print("mod_VCO2:");
-      //Serial.println(modulation_data[mod_VCO2]);
+    //if (//Serial.availableForWrite()){
+      ////Serial.print("VCO2_FQ:");
+      //Serial.write("O2");
+      //Serial.write((uint8_t)(adc_value16[VCO2_FQ] & 0xFF));
+      //Serial.write((uint8_t)(adc_value16[VCO2_FQ] >> 8));
+      ////Serial.println(adc_value16[VCO2_FQ]);
+      ////Serial.print("mod_VCO2:");
+      ////Serial.println(modulation_data[mod_VCO2]);
     //}
-    //if (Serial.availableForWrite()){
-      //Serial.print("VCO3_FQ:");
-      //Serial.println(adc_value16[VCO3_FQ]);
-      //Serial.print("mod_VCO3:");
-      //Serial.println(modulation_data[mod_VCO3]);
+    //if (//Serial.availableForWrite()){
+      ////Serial.print("VCO3_FQ:");
+      //Serial.write("O3");
+      //Serial.write((uint8_t)(adc_value16[VCO3_FQ] & 0xFF));
+      //Serial.write((uint8_t)(adc_value16[VCO3_FQ] >> 8));
+      ////Serial.println(adc_value16[VCO3_FQ]);
+      ////Serial.print("mod_VCO3:");
+      ////Serial.println(modulation_data[mod_VCO3]);
     //}
-    //if (Serial.availableForWrite()){
-      //Serial.print("LFO1_FQ:");
-      //Serial.println(adc_value16[LFO1_FQ]);
-      //Serial.print("mod_LFO1:");
-      //Serial.println(modulation_data[mod_LFO1]);
+    //if (//Serial.availableForWrite()){
+      ////Serial.print("LFO1_FQ:");
+      //Serial.write("L1");
+      //Serial.write((uint8_t)(adc_value16[LFO1_FQ] & 0xFF));
+      //Serial.write((uint8_t)(adc_value16[LFO1_FQ] >> 8));
+      ////Serial.println(adc_value16[LFO1_FQ]);
+      ////Serial.print("mod_LFO1:");
+      ////Serial.println(modulation_data[mod_LFO1]);
     //}
-    //if (Serial.availableForWrite()){
-      //Serial.print("LFO2_FQ:");
-      //Serial.println(adc_value16[LFO2_1]);
-      //Serial.print("mod_LFO2:");
-      //Serial.println(modulation_data[mod_LFO2]);
+    //if (//Serial.availableForWrite()){
+      ////Serial.print("LFO2_FQ:");
+      //Serial.write("L2");
+      //Serial.write((uint8_t)(adc_value16[LFO2_1] & 0xFF));
+      //Serial.write((uint8_t)(adc_value16[LFO2_1] >> 8));
+      ////Serial.println(adc_value16[LFO2_1]);
+      ////Serial.print("mod_LFO2:");
+      ////Serial.println(modulation_data[mod_LFO2]);
     //}
-    //if (Serial.availableForWrite()){
-      //Serial.print("LFO3_FQ:");
-      //Serial.println(adc_value16[LFO3_1]);
-      //Serial.print("mod_LFO3:");
-      //Serial.println(modulation_data[mod_LFO3]);
-    }
-}
+    //if (//Serial.availableForWrite()){
+      ////Serial.print("LFO3_FQ:");
+      //Serial.write("L3");
+      //Serial.write((uint8_t)(adc_value16[LFO3_1] & 0xFF));
+      //Serial.write((uint8_t)(adc_value16[LFO3_1] >> 8));
+      ////Serial.println(adc_value16[LFO3_1]);
+      ////Serial.print("mod_LFO3:");
+      ////Serial.println(modulation_data[mod_LFO3]);
+//    }
+  }
+  #endif
   
   //analog_out_1((modulation_data[modulation_index[index_VCO1_MOD1]]<<16)^0x80000000);
   //analog_out_2((modulation_data_AM[modulation_index[index_VCO1_MOD1]]<<16));

@@ -708,19 +708,30 @@ inline void keyboard_in() {
         KEY_LOCAL_goal = KEY_LOCAL_tmp  << (2+18);
       }
       NOTE_ON = KEY_LOCAL_tmp;
+      #ifdef serialout
+        if (NOTE_ON) {
+        Serial.print("Note:");
+        Serial.println(NOTE_ON-16);
+        }
+      #endif
     }
     
     KEY_old = KEY;
 
-    //Serial.print("ONote/Note:");
-    //Serial.print(KEY_old);
-    Serial.print("Note:");
-    Serial.println(NOTE_ON);
-/*    if (Serial.availableForWrite()){
-     Serial.print("VCO1_FQ");
-     Serial.println(adc_value16[VCO1_FQ]);
+  #ifdef serialout
+    ////Serial.print("ONote/Note:");
+    ////Serial.print(KEY_old);
+    //Serial.print("Note:");
+    //Serial.println(NOTE_ON);
+    //Serial.print(",KEY_LOCAL_goal:");
+    //Serial.println(KEY_LOCAL_goal);
+    
+/*    if (//Serial.availableForWrite()){
+     //Serial.print("VCO1_FQ");
+     //Serial.println(adc_value16[VCO1_FQ]);
     }
 */
+  #endif
     
     break;
   }
@@ -730,8 +741,10 @@ inline void PORTAMENTO_update() {
   uint32_t tmp32;
   tmp32 = adc_value16[PORTAMENTO_VALUE];
   portamento = (table_CV2freq[0x350-(tmp32>>7)]);
-  //Serial.write(0xA0);
-  //Serial.write(portamento);
+  #ifdef serialout
+  ////Serial.write(0xA0);
+  ////Serial.write(portamento);
+  #endif
 }
 
 inline void PORTAMENTO() {

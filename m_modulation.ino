@@ -79,24 +79,26 @@ inline void joystick() {
   JYp = (0x7000 > joystickY)? (0x7000 - joystickY): 0;
   JYm = (joystickY > 0x9000)? (joystickY - 0x9000): 0;      
 
+  #ifdef serialout
   if (Serial.availableForWrite()){
    if (JXp) {
     Serial.write("X");
-    //Serial.println(JXp);
+    ////Serial.println(JXp);
    }
    if (JXm) {
     Serial.write("x");
-    //Serial.println(JXm);
+    ////Serial.println(JXm);
    }
    if (JYp) {
     Serial.write("Y");
-    //Serial.println(JYp);
+    ////Serial.println(JYp);
    }
    if (JYm) {
     Serial.write("y");
-    //Serial.println(JYm);
+    ////Serial.println(JYm);
    }
   }
+  #endif
 }
 
 inline void joystick_audio() {
