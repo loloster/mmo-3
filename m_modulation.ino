@@ -80,21 +80,49 @@ inline void joystick() {
   JYm = (joystickY > 0x9000)? (joystickY - 0x9000): 0;      
 
   #ifdef serialout
-  if (Serial.availableForWrite()){
+  if (SerialUSB.availableForWrite()){
    if (JXp) {
-    Serial.write("X");
+//    SerialUSB.write("X");
+    SerialUSB.write(0xFF);
+    SerialUSB.write(30);
+    SerialUSB.write((byte)0x00);
+    SerialUSB.write((byte)0x00);
+    SerialUSB.write(adc_value16[XY_X] >>  8 & 0xFF);
+    SerialUSB.write(adc_value16[XY_X] >>  0 & 0xFF);
+
     ////Serial.println(JXp);
    }
    if (JXm) {
-    Serial.write("x");
+//    SerialUSB.write("x");
     ////Serial.println(JXm);
+    SerialUSB.write(0xFF);
+    SerialUSB.write(30);
+    SerialUSB.write((byte)0x00);
+    SerialUSB.write((byte)0x00);
+    SerialUSB.write(adc_value16[XY_X] >>  8 & 0xFF);
+    SerialUSB.write(adc_value16[XY_X] >>  0 & 0xFF);
+
    }
    if (JYp) {
-    Serial.write("Y");
+    //SerialUSB.write("Y");
+    SerialUSB.write(0xFF);
+    SerialUSB.write(31);
+    SerialUSB.write((byte)0x00);
+    SerialUSB.write((byte)0x00);
+    SerialUSB.write(adc_value16[XY_Y] >>  8 & 0xFF);
+    SerialUSB.write(adc_value16[XY_Y] >>  0 & 0xFF);
+
     ////Serial.println(JYp);
    }
    if (JYm) {
-    Serial.write("y");
+    //SerialUSB.write("y");
+    SerialUSB.write(0xFF);
+    SerialUSB.write(31);
+    SerialUSB.write((byte)0x00);
+    SerialUSB.write((byte)0x00);
+    SerialUSB.write(adc_value16[XY_Y] >>  8 & 0xFF);
+    SerialUSB.write(adc_value16[XY_Y] >>  0 & 0xFF);
+        
     ////Serial.println(JYm);
    }
   }

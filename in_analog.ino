@@ -123,6 +123,15 @@ inline void analog_in() {
   
   //adc_value[adc_channel] = tmp >> 4;
   adc_value16[adc_channel] = tmp;
+  
+  /*
+  if (SerialUSB.availableForWrite()){
+  SerialUSB.print("adc_value16[");
+  SerialUSB.print(adc_channel);
+  SerialUSB.print("]=");
+  SerialUSB.println(adc_value16[adc_channel]);
+  }
+  */
 
   #ifndef EXT_MIDI
     if (++adc_channel == 33) adc_channel=0;

@@ -86,13 +86,13 @@ enum modulation_value {
   mod_LFO2,
   mod_LFO3,
   mod_ADSR,
-  mod_EXT1,
-  mod_LR,
+  mod_EXT1, // mod "CV"
+  mod_LR, // mod "LINE IN"
   mod_XY, // joystick
   mod_L, // audio Left
   mod_R,
   mod_1,
-  mod_0, // not ued, just to have 16 value in this list
+  mod_0, // not used, just to have 16 value in this list
   mod_00,
   mod_000
 };
