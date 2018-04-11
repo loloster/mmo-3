@@ -22,6 +22,7 @@
 
 // sound caractere.  
 #define DAC_clear 1 // 1 for "clear", 0 for "fat"
+//#define DAC_clear 0 // 1 for "clear", 0 for "fat"
 
 // more distortion after the MIX  
 #define double_disto

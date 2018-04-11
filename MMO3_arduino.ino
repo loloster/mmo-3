@@ -84,15 +84,19 @@ uint32_t dac_on;
 
 #ifdef serialout
   // Loop Counter
-  uint32_t loopc;
+  uint8_t loopc;
+  
+  // main loop "jumper"
+  uint8_t slowloop=0;
 
   // 2nd Loop Counter
   uint8_t compteur_cc = 0;
 
   // for incoming serial data  
-  int incomingByte = 0;
+  int incomingByte = 0xFF;
 
   // shotgun
+  //const byte szshtgn=4;
   byte shotgun[4];
   uint8_t shotguncounter=2;
   
@@ -102,10 +106,14 @@ void setup() {
   uint32_t i;
 
   #ifdef serialout
-  shotgun[0]=0xFF;
-  shotgun[1]=0xFF;
-  shotgun[2]=0xFF;
-  shotgun[3]=0xFF;
+  /*for (i=0;i<szshtgn;i++){
+    shotgun[i]=0xFF;
+    }
+    */
+    shotgun[0]=0xFF;
+    shotgun[1]=0xFF;
+    shotgun[2]=0xFF;
+    shotgun[3]=0xFF;
   #endif
   
   REG_PMC_PCER0 = 1 << 11; // enable la clock du port PIO A pour les entree
@@ -151,7 +159,9 @@ void setup() {
   #ifdef serialout
     Serial.begin(9600);
     //Serial.begin(57600);
-    SerialUSB.begin(9600);
+    //SerialUSB.begin(9600);
+    //SerialUSB.begin(57600);
+    SerialUSB.begin(115200);
   //SPI.begin(4);
     Serial.println("Hey! Hey!");
     Serial.println("MMO-3!");
@@ -171,8 +181,8 @@ void setup() {
 
 inline void main_loop() { // as fast as possible
   uint32_t compteur, tmpU32;
-  int32_t tmp32;
-  uint32_t i;
+  int32_t tmp32;/*=0;*/
+  uint8_t i;/*, j;*/
   
   
   
@@ -217,6 +227,8 @@ inline void main_loop() { // as fast as possible
   update_leds(); // gate and midi leds
 
   #ifdef serialout
+
+//SerialUSB.print > https://forum.arduino.cc/index.php?topic=410584.0
   if (SerialUSB.available() > 0) {
       //read the incoming byte:
       incomingByte = SerialUSB.read();
@@ -228,13 +240,15 @@ inline void main_loop() { // as fast as possible
         shotguncounter=2;
         shotgun[0]=incomingByte;
       } else if (incomingByte > 0)
-        if (incomingByte == 0xFF) {
-          shotgun[0]=0xFF;
-          shotgun[1]=0xFF;
-          shotgun[2]=0xFF;
-          shotgun[3]=0xFF;
+        if (incomingByte == 0xFF) /*for (i=0;i<szshtgn;i++)*/ {
+          /*shotgun[i]=0xFF;*/
+           shotgun[0]=0xFF;
+           shotgun[1]=0xFF;
+           shotgun[2]=0xFF;
+           shotgun[3]=0xFF;
+           slowloop=0;
         }
-        else { // continuous dump
+        else { // setting up continuous dump messages
          if (incomingByte ==  shotgun[1]) {
           shotgun[1]=shotgun[2];
           shotgun[2]=shotgun[3];
@@ -252,23 +266,46 @@ inline void main_loop() { // as fast as possible
            else {
             shotgun[3]=shotgun[2];
             shotgun[2]=shotgun[1];
-            shotgun[1]=incomingByte;             
+            shotgun[1]=incomingByte;
+            slowloop = (shotgun[2] == 0xFF) ? 0 : 1;
            }
           }
          }
         }
-      
-      Serial.print("shotgun[0]:");
-      Serial.println(shotgun[0]);
-      Serial.print("shotgun[1]:");
-      Serial.println(shotgun[1]);
-      Serial.print("shotgun[2]:");
-      Serial.println(shotgun[2]);
-      Serial.print("shotgun[3]:");
-      Serial.println(shotgun[3]);
-      
-  }
-  if (!(loopc++ < 1)){
+        /*{ tmp32=0;
+          for (i=1;i<szshtgn;i++) {
+            if (incomingByte == shotgun[i]) {
+              for (j=i;j<szshtgn-1;j++) {
+                shotgun[j]=shotgun[j+1];
+              }
+              shotgun[szshtgn-1]=0xFF;
+              tmp32=1;
+            }
+          }
+          if (!tmp32) {
+            for (j=szshtgn;j>1;--j){
+              shotgun[j]=shotgun[j-1];
+            }
+            shotgun[1]=incomingByte;
+          }
+        }*/
+/*        Serial.print("shotgun[0]:");
+        Serial.println(shotgun[0]);
+        Serial.print("shotgun[1]:");
+        Serial.println(shotgun[1]);
+        Serial.print("shotgun[2]:");
+        Serial.println(shotgun[2]);
+        Serial.print("shotgun[3]:");
+        Serial.println(shotgun[3]);
+*/      /*for (i=0;i<szshtgn;i++) {
+        Serial.print("shotgun[");
+        Serial.print(i);
+        Serial.print("]:");
+        Serial.println(shotgun[i]);
+      }*/
+  }// else incomingByte=0xFF;
+  
+  if (!(loopc++ < slowloop)){
     loopc=0;
     /*if (SerialUSB.available() > 0) {
       //read the incoming byte:
@@ -277,8 +314,10 @@ inline void main_loop() { // as fast as possible
         //        SerialUSB.print("I received: ");
         //        SerialUSB.println(incomingByte, DEC);
     }*/
+    if (incomingByte != 0xFF) {
     //if (Serial.availableForWrite()){
       //switch ((compteur_cc++ % 32)) {
+      //for (i=0;i<szshtgn;i++){
       for (i=0;i<4;i++){
         switch (shotgun[i]) {
       //switch (incomingByte) {
@@ -355,443 +394,10 @@ inline void main_loop() { // as fast as possible
         shotguncounter--;
         }
         break;
-        
-        /*SerialUSB.print("VCO1_FQ:");
-        SerialUSB.print(adc_value16[VCO1_FQ],HEX);
-        SerialUSB.print("/");
-        SerialUSB.print("VCO1_MOD1:");
-        SerialUSB.print(adc_value16[VCO1_MOD1],HEX);
-        SerialUSB.print("/");
-        SerialUSB.print("VCO1_MOD2:");
-        SerialUSB.print(adc_value16[VCO1_MOD2],HEX);
-        SerialUSB.print("/");
-        SerialUSB.print("VCO1_MOD3:");
-        SerialUSB.print(adc_value16[VCO1_MOD3],HEX);
-        SerialUSB.print("/");
-        */
-        /*if (0 < shotguncounter) {
-        SerialUSB.write(0xFF);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write(adc_value16[VCO1_FQ] >>  8 & 0xFF);
-        SerialUSB.write(adc_value16[VCO1_FQ] >>  0 & 0xFF);
-        shotguncounter--;
         }
-        break;
-        */
-        //case 100:/*0x64*/
-        /*
-        SerialUSB.write(0xFF);
-        SerialUSB.write(100);
-        SerialUSB.write(modulation_data[mod_VCO1] >> 24 & 0xFF);
-        SerialUSB.write(modulation_data[mod_VCO1] >> 16 & 0xFF);
-        SerialUSB.write(modulation_data[mod_VCO1] >>  8 & 0xFF);
-        SerialUSB.write(modulation_data[mod_VCO1] >>  0 & 0xFF);
-        */
-        /*        
-        SerialUSB.print("mod_VCO1:");
-        SerialUSB.print(modulation_data[mod_VCO1]);
-        */
-/*        Serial.write((byte)0xFF);
-        Serial.write((byte)0x00);
-        Serial.write((uint8_t)(adc_value16[VCO1_FQ] >> 8));
-        Serial.write((uint8_t)(adc_value16[VCO1_FQ] & 0xFF));
-*/
-        //SerialUSB.println("Reinit!");
-        //break;
-        /*
-        case 5:
-        if (0 < shotguncounter) {
-        SerialUSB.write(0xFF);
-        SerialUSB.write(0x05);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write(adc_value16[VCO2_FQ] >>  8 & 0xFF);
-        SerialUSB.write(adc_value16[VCO2_FQ] >>  0 & 0xFF);
-        shotguncounter--;
-        }
-        */
-        /*SerialUSB.print("|VCO2_FQ:");
-        SerialUSB.print(adc_value16[VCO2_FQ]);
-        SerialUSB.print("/");
-        */
-        /*
-        SerialUSB.write(0xFF);
-        SerialUSB.write(105);
-        SerialUSB.write(modulation_data[mod_VCO2]);
-        */
-        /*
-        SerialUSB.print("|mod_VCO2:");
-        SerialUSB.print(modulation_data[mod_VCO2]);
-        */
-/*        Serial.write((byte)0xFF);
-        Serial.write((byte)0x05);
-        Serial.write((uint8_t)(adc_value16[VCO2_FQ] >> 8));
-        Serial.write((uint8_t)(adc_value16[VCO2_FQ] & 0xFF));
-*/      
-        //break;
-        
-        //case 105:/*0x69*/
-        /*
-        SerialUSB.write(0xFF);
-        SerialUSB.write(105);
-        SerialUSB.write(modulation_data[mod_VCO2] >> 24 & 0xFF);
-        SerialUSB.write(modulation_data[mod_VCO2] >> 16 & 0xFF);
-        SerialUSB.write(modulation_data[mod_VCO2] >>  8 & 0xFF);
-        SerialUSB.write(modulation_data[mod_VCO2] >>  0 & 0xFF);
-        break;
-        */
-        /*
-        case 9:
-        if (0 < shotguncounter) {
-        SerialUSB.write(0xFF);
-        SerialUSB.write(0x09);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write(adc_value16[VCO3_FQ] >>  8 & 0xFF);
-        SerialUSB.write(adc_value16[VCO3_FQ] >>  0 & 0xFF);
-        shotguncounter--;
-        }
-        */
-        /*SerialUSB.print("|VCO3_FQ:");
-        SerialUSB.print(adc_value16[VCO3_FQ]);
-        SerialUSB.print("/");
-        */
-        /*SerialUSB.write(0xFF);
-        SerialUSB.write(109);
-        SerialUSB.write(modulation_data[mod_VCO3]);
-        */
-        /*
-        SerialUSB.print("|mod_VCO3:");
-        SerialUSB.print(modulation_data[mod_VCO3]);
-        */
-/*        Serial.write((byte)0xFF);
-        Serial.write((byte)0x09);
-        Serial.write((uint8_t)(adc_value16[VCO3_FQ] >> 8));
-        Serial.write((uint8_t)(adc_value16[VCO3_FQ] & 0xFF));
-*/      
-/*
-        break;
-        */
-        
-        //case 109:/*0x6D*/
-        /*
-        SerialUSB.write(0xFF);
-        SerialUSB.write(109);
-        SerialUSB.write(modulation_data[mod_VCO3] >> 24 & 0xFF);
-        SerialUSB.write(modulation_data[mod_VCO3] >> 16 & 0xFF);
-        SerialUSB.write(modulation_data[mod_VCO3] >>  8 & 0xFF);
-        SerialUSB.write(modulation_data[mod_VCO3] >>  0 & 0xFF);
-        break;
-        */
-
-/*
-        case 13:/*0x0Dh*/
-//*/        
-        /*Serial.write((byte)0xFF);*/
-        /*
-        Serial.write((byte)13);
-        Serial.write((uint8_t)(adc_value16[LFO1_FQ] >> 8));
-        Serial.write((uint8_t)(adc_value16[LFO1_FQ] & 0xFF));
-        */
-//SerialUSB.print > https://forum.arduino.cc/index.php?topic=410584.0
-        /*SerialUSB.print("|LFO1_FQ:");
-        SerialUSB.print(adc_value16[LFO1_FQ]);
-        SerialUSB.print("/");
-        SerialUSB.print("LFO1_WF:");
-        SerialUSB.print(adc_value16[LFO1_WF]);
-        SerialUSB.print("/");
-        SerialUSB.print("LFO1_SYM:");
-        SerialUSB.print(adc_value16[LFO1_SYM]);
-        SerialUSB.print("/");
-        */
-        /*
-        if (0 < shotguncounter) {
-        SerialUSB.write(0xFF);
-        SerialUSB.write(13);
-        */
-        /*
-        SerialUSB.write(0x12345678 >> 24 & 0xFF);
-        SerialUSB.write(0x12345678 >> 16 & 0xFF);
-        SerialUSB.write(0x12345678 >> 8 & 0xFF);
-        SerialUSB.write(0x12345678 & 0xFF);
-        */
-        /*
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write(adc_value16[LFO1_FQ] >>  8 & 0xFF);
-        SerialUSB.write(adc_value16[LFO1_FQ] >>  0 & 0xFF);
-        shotguncounter--;
-        }
-        */
-        /*
-        SerialUSB.print("|mod_LFO1:");
-        SerialUSB.print(modulation_data[mod_LFO1]);
-        */
-        /*
-        break;
-        */
-        //case 113:/*0x71h*/
-        /*
-        SerialUSB.write(0xFF);
-        SerialUSB.write(113);
-        SerialUSB.write(modulation_data[mod_LFO1] >> 24 & 0xFF);
-        SerialUSB.write(modulation_data[mod_LFO1] >> 16 & 0xFF);
-        SerialUSB.write(modulation_data[mod_LFO1] >>  8 & 0xFF);
-        SerialUSB.write(modulation_data[mod_LFO1] >>  0 & 0xFF);
-        
-        break;
-        */
-        /*
-        //case 17:/*0x11h*/
-//        */
-        /*
-        if (0 < shotguncounter) {
-        SerialUSB.write(0xFF);
-        SerialUSB.write(17);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write(adc_value16[LFO2_1] >>  8 & 0xFF);
-        SerialUSB.write(adc_value16[LFO2_1] >>  0 & 0xFF);
-        shotguncounter--;
-        }
-        */
-        /*
-        Serial.write((byte)0xFF);
-        Serial.write((byte)17);
-        Serial.write((uint8_t)(adc_value16[LFO2_1] >> 8));
-        Serial.write((uint8_t)(adc_value16[LFO2_1] & 0xFF));
-        Serial.write((uint8_t)(modulation_data[mod_LFO2] >> 8));
-        Serial.write((uint8_t)(modulation_data[mod_LFO2] & 0xFF));
-        */
-        /*
-        SerialUSB.print("|LFO2_FQ1:");
-        SerialUSB.print(adc_value16[LFO2_1]);
-        SerialUSB.print("/");
-        SerialUSB.print("LFO2_FQ2:");
-        SerialUSB.print(adc_value16[LFO2_2]);
-        SerialUSB.print("/");
-        SerialUSB.print("LFO2_MOD:");
-        SerialUSB.print(adc_value16[LFO2_3]);
-        SerialUSB.print("/");
-        */
-        /*
-        SerialUSB.write(0xFF);
-        SerialUSB.write(117);
-        SerialUSB.write(modulation_data[mod_LFO2]);
-        */
-        /*SerialUSB.print("|mod_LFO2:");
-        SerialUSB.print(modulation_data[mod_LFO2],HEX);*/
-        /*
-        break;
-        */
-        //case 117:/*0x75h*/
-        /*
-        SerialUSB.write(0xFF);
-        SerialUSB.write(117);
-        SerialUSB.write(modulation_data[mod_LFO2] >> 24 & 0xFF);
-        SerialUSB.write(modulation_data[mod_LFO2] >> 16 & 0xFF);
-        SerialUSB.write(modulation_data[mod_LFO2] >>  8 & 0xFF);
-        SerialUSB.write(modulation_data[mod_LFO2] >>  0 & 0xFF);
-        break;
-        */
-        /*
-        case 21:/*0x15h*/
-//        */
-        /*
-        if (0 < shotguncounter) {
-        SerialUSB.write(0xFF);
-        SerialUSB.write(21);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write(adc_value16[LFO3_1] >>  8 & 0xFF);
-        SerialUSB.write(adc_value16[LFO3_1] >>  0 & 0xFF);
-        shotguncounter--;
-        }
-        */
-        /*
-        Serial.write((byte)0xFF);
-        Serial.write((byte)21);
-        Serial.write((uint8_t)(adc_value16[LFO3_1] >> 8));
-        Serial.write((uint8_t)(adc_value16[LFO3_1] & 0xFF));
-        */
-        /*
-        SerialUSB.print("|LFO3_FQ:");
-        SerialUSB.print(adc_value16[LFO3_1]);
-        SerialUSB.print("/");
-        SerialUSB.print("LFO3_PRM1:");
-        SerialUSB.print(adc_value16[LFO3_2]);
-        SerialUSB.print("/");
-        SerialUSB.print("LFO3_PRM2:");
-        SerialUSB.print(adc_value16[LFO3_3]);
-        SerialUSB.print("/");
-        */
-        /*
-        SerialUSB.write(0xFF);
-        SerialUSB.write(121);
-        SerialUSB.write(modulation_data[mod_LFO3]);
-        */
-        /*
-        SerialUSB.print("|mod_LFO3:");
-        SerialUSB.println(modulation_data[mod_LFO3]);
-        */
-        /*
-        break;
-        */
-        //case 121:/*0x79h*/
-        /*
-        SerialUSB.write(0xFF);
-        SerialUSB.write(121);
-        SerialUSB.write(modulation_data[mod_LFO3] >> 24 & 0xFF);
-        SerialUSB.write(modulation_data[mod_LFO3] >> 16 & 0xFF);
-        SerialUSB.write(modulation_data[mod_LFO3] >>  8 & 0xFF);
-        SerialUSB.write(modulation_data[mod_LFO3] >>  0 & 0xFF);
-        break;
-        */
-        //case 122:/*0x7Ah*/
-        /*
-        SerialUSB.write(0xFF);
-        SerialUSB.write(122);
-        SerialUSB.write((int32_t) -2 >> 24 & 0xFF);
-        SerialUSB.write((int32_t) -2 >> 16 & 0xFF);
-        SerialUSB.write((int32_t) -2 >>  8 & 0xFF);
-        SerialUSB.write((int32_t) -2 >>  0 & 0xFF);
-        break;
-        */
-/*
-        case 30:/*0x1E*/ /*JX*/
-//        */
-        /*
-        if (0 < shotguncounter) {
-        SerialUSB.write(0xFF);
-        SerialUSB.write(30);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write(adc_value16[XY_X] >>  8 & 0xFF);
-        SerialUSB.write(adc_value16[XY_X] >>  0 & 0xFF);
-        shotguncounter--;
-        }
-        break;  
-        */
-        /*
-        case 31:/*0x1F*/ /*JY*/
-        //*/
-        /*
-        if (0 < shotguncounter) {
-        SerialUSB.write(0xFF);
-        SerialUSB.write(31);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write(adc_value16[XY_Y] >>  8 & 0xFF);
-        SerialUSB.write(adc_value16[XY_Y] >>  0 & 0xFF);
-        shotguncounter--;
-        }
-        break;  
-        */
-/*        
-        case 32:
-        Serial.write((byte)0xFF);
-        Serial.write((byte)32);
-        Serial.write((uint8_t)(KEY_LOCAL_goal >> 24));
-        Serial.write((uint8_t)(KEY_LOCAL_goal >> 16));
-        //Serial.write((uint8_t)(KEY_LOCAL_goal >> 8));
-        //Serial.write((uint8_t)(KEY_LOCAL_goal & 0xFF));
-        break;
-*/
-//        case 33:
-//        Serial.write((byte)0xFF);
-//        Serial.write((byte)0x33);
-//        Serial.write((uint8_t)(modulation_data[mod_LFO1] >> 8));
-//        Serial.write((uint8_t)(modulation_data[mod_LFO1] & 0xFF));
-//        Serial.print("mod_LFO1:");
-//        Serial.println(modulation_data[mod_LFO1]);
-//        break;
-
-/*        case 34:
-        Serial.write((byte)0xFF);
-        Serial.write((byte)34);
-        Serial.write((uint8_t)(modulation_data[mod_LFO2] >> 8));
-        Serial.write((uint8_t)(modulation_data[mod_LFO2] & 0xFF));
-        break;
-        case 35:
-        Serial.write((byte)0xFF);
-        Serial.write((byte)35);
-        Serial.write((uint8_t)(modulation_data[mod_LFO3] >> 8));
-        Serial.write((uint8_t)(modulation_data[mod_LFO3] & 0xFF));
-        break;
-*/      default:
-        //SerialUSB.println("I don't know what to do with that value darling:");
-        //SerialUSB.write(incomingByte);
-        
-        //incomingByte = 0xFF;
-        
-        //Serial.write((byte)0x00);
-        //Serial.write((byte)0x00);
-        //Serial.write((byte)0x00);
-        //Serial.write((byte)0x00);
-        break;
       }
-      //SPI.transfer(4, 0xF0, SPI_CONTINUE);
-      //SPI.transfer(adc_value16[VCO1_FQ]);
-      //SPI.transfer(4, 0xF0);
-
-      //Serial.write("O1");
-      //Serial.write((uint8_t)(adc_value16[VCO1_FQ] & 0xFF));
-      //Serial.write((uint8_t)(adc_value16[VCO1_FQ] >> 8));
-      //Serial.print("VCO1_FQ:");
-      //Serial.println(adc_value16[VCO1_FQ]);
-      //Serial.print("mod_VCO1:");
-      //Serial.println(modulation_data[mod_VCO1]);
-      //Serial.print("KEY_LOCAL_goal:");
-      //Serial.println(KEY_LOCAL_goal);
-    //}
-    //if (//Serial.availableForWrite()){
-      ////Serial.print("VCO2_FQ:");
-      //Serial.write("O2");
-      //Serial.write((uint8_t)(adc_value16[VCO2_FQ] & 0xFF));
-      //Serial.write((uint8_t)(adc_value16[VCO2_FQ] >> 8));
-      ////Serial.println(adc_value16[VCO2_FQ]);
-      ////Serial.print("mod_VCO2:");
-      ////Serial.println(modulation_data[mod_VCO2]);
-    //}
-    //if (//Serial.availableForWrite()){
-      ////Serial.print("VCO3_FQ:");
-      //Serial.write("O3");
-      //Serial.write((uint8_t)(adc_value16[VCO3_FQ] & 0xFF));
-      //Serial.write((uint8_t)(adc_value16[VCO3_FQ] >> 8));
-      ////Serial.println(adc_value16[VCO3_FQ]);
-      ////Serial.print("mod_VCO3:");
-      ////Serial.println(modulation_data[mod_VCO3]);
-    //}
-    //if (//Serial.availableForWrite()){
-      ////Serial.print("LFO1_FQ:");
-      //Serial.write("L1");
-      //Serial.write((uint8_t)(adc_value16[LFO1_FQ] & 0xFF));
-      //Serial.write((uint8_t)(adc_value16[LFO1_FQ] >> 8));
-      ////Serial.println(adc_value16[LFO1_FQ]);
-      ////Serial.print("mod_LFO1:");
-      ////Serial.println(modulation_data[mod_LFO1]);
-    //}
-    //if (//Serial.availableForWrite()){
-      ////Serial.print("LFO2_FQ:");
-      //Serial.write("L2");
-      //Serial.write((uint8_t)(adc_value16[LFO2_1] & 0xFF));
-      //Serial.write((uint8_t)(adc_value16[LFO2_1] >> 8));
-      ////Serial.println(adc_value16[LFO2_1]);
-      ////Serial.print("mod_LFO2:");
-      ////Serial.println(modulation_data[mod_LFO2]);
-    //}
-    //if (//Serial.availableForWrite()){
-      ////Serial.print("LFO3_FQ:");
-      //Serial.write("L3");
-      //Serial.write((uint8_t)(adc_value16[LFO3_1] & 0xFF));
-      //Serial.write((uint8_t)(adc_value16[LFO3_1] >> 8));
-      ////Serial.println(adc_value16[LFO3_1]);
-      ////Serial.print("mod_LFO3:");
-      ////Serial.println(modulation_data[mod_LFO3]);
-    //}
-  }}
+    }
+  }
   #endif
   
   //analog_out_1((modulation_data[modulation_index[index_VCO1_MOD1]]<<16)^0x80000000);
