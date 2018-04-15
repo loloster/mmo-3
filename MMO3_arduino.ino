@@ -84,10 +84,10 @@ uint32_t dac_on;
 
 #ifdef serialout
   // Loop Counter
-  uint8_t loopc;
+  uint16_t loopc;
   
   // main loop "jumper"
-  uint8_t slowloop=0;
+  uint16_t slowloop=0;
 
   // 2nd Loop Counter
   uint8_t compteur_cc = 0;
@@ -232,11 +232,9 @@ inline void main_loop() { // as fast as possible
   if (SerialUSB.available() > 0) {
       //read the incoming byte:
       incomingByte = SerialUSB.read();
-      /*
-      SerialUSB.print("I received: ");
-      SerialUSB.println(incomingByte, DEC);
-      */
-      if ((incomingByte < 100) || (incomingByte == 0xF0)){
+      Serial.print("I received: ");
+      Serial.println(incomingByte, DEC);
+      if ((incomingByte < 100) || (incomingByte == 0xF0) || (incomingByte == 0xF1) || (incomingByte == 0xF2)){
         shotguncounter=2;
         shotgun[0]=incomingByte;
       } else if (incomingByte > 0)
@@ -267,7 +265,7 @@ inline void main_loop() { // as fast as possible
             shotgun[3]=shotgun[2];
             shotgun[2]=shotgun[1];
             shotgun[1]=incomingByte;
-            slowloop = (shotgun[2] == 0xFF) ? 0 : 1;
+            slowloop = ((slowloop == 1) && (shotgun[2] == 0xFF)) ? 0 : !(slowloop) ? 1 : slowloop;
            }
           }
          }
@@ -303,7 +301,7 @@ inline void main_loop() { // as fast as possible
         Serial.print("]:");
         Serial.println(shotgun[i]);
       }*/
-  }// else incomingByte=0xFF;
+  } // else incomingByte=0xFF;
   
   if (!(loopc++ < slowloop)){
     loopc=0;
@@ -394,6 +392,31 @@ inline void main_loop() { // as fast as possible
         shotguncounter--;
         }
         break;
+
+        case 0xF1:
+        if (0 < shotguncounter) {
+          if (!(SerialUSB.available() > 0))
+            slowloop++;
+            else slowloop = SerialUSB.read();
+
+        Serial.print("Slowing down shotgun:");
+        Serial.println(slowloop);
+        shotguncounter=0;
+        }
+        break;
+        
+        case 0xF2:
+        if (0 < shotguncounter) {
+          if (!(SerialUSB.available() > 0))
+            slowloop = (1 < slowloop) ? --slowloop : (shotgun[2] == 0xFF) ? 0 : 1;
+            else slowloop = SerialUSB.read();
+        
+        Serial.print("Speeding up shotgun:");
+        Serial.println(slowloop);
+        shotguncounter=0;
+        }
+        break;
+
         }
       }
     }
