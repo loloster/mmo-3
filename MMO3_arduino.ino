@@ -229,10 +229,10 @@ inline void main_loop() { // as fast as possible
   #ifdef serialout
 
 //SerialUSB.print > https://forum.arduino.cc/index.php?topic=410584.0
-  if ((SerialUSB.available() > 0) || (Serial.available() > 0)){
+  if ((SerialUSB.available() > 0)){ // || (Serial.available() > 0)){
       //read the incoming byte:
-      if (SerialUSB.available() > 0) incomingByte = SerialUSB.read();
-        else incomingByte = Serial.read();
+      /*if (SerialUSB.available() > 0)*/ incomingByte = SerialUSB.read();
+        //else incomingByte = Serial.read();
       Serial.print("I received: ");
       Serial.println(incomingByte, DEC);
       if ((incomingByte < 100) || (incomingByte == 0xF0) || (incomingByte == 0xF1) || (incomingByte == 0xF2)){
