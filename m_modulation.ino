@@ -85,8 +85,8 @@ inline void joystick() {
 //    SerialUSB.write("X");
     SerialUSB.write(0xFF);
     SerialUSB.write(30);
-    SerialUSB.write((byte)0x00);
-    SerialUSB.write((byte)0x00);
+//    SerialUSB.write((byte)0x00);
+//    SerialUSB.write((byte)0x00);
     SerialUSB.write(adc_value16[XY_X] >>  8 & 0xFF);
     SerialUSB.write(adc_value16[XY_X] >>  0 & 0xFF);
 
@@ -97,8 +97,8 @@ inline void joystick() {
     ////Serial.println(JXm);
     SerialUSB.write(0xFF);
     SerialUSB.write(30);
-    SerialUSB.write((byte)0x00);
-    SerialUSB.write((byte)0x00);
+//    SerialUSB.write((byte)0x00);
+//    SerialUSB.write((byte)0x00);
     SerialUSB.write(adc_value16[XY_X] >>  8 & 0xFF);
     SerialUSB.write(adc_value16[XY_X] >>  0 & 0xFF);
 
@@ -107,8 +107,8 @@ inline void joystick() {
     //SerialUSB.write("Y");
     SerialUSB.write(0xFF);
     SerialUSB.write(31);
-    SerialUSB.write((byte)0x00);
-    SerialUSB.write((byte)0x00);
+//    SerialUSB.write((byte)0x00);
+//    SerialUSB.write((byte)0x00);
     SerialUSB.write(adc_value16[XY_Y] >>  8 & 0xFF);
     SerialUSB.write(adc_value16[XY_Y] >>  0 & 0xFF);
 
@@ -118,8 +118,8 @@ inline void joystick() {
     //SerialUSB.write("y");
     SerialUSB.write(0xFF);
     SerialUSB.write(31);
-    SerialUSB.write((byte)0x00);
-    SerialUSB.write((byte)0x00);
+//    SerialUSB.write((byte)0x00);
+//    SerialUSB.write((byte)0x00);
     SerialUSB.write(adc_value16[XY_Y] >>  8 & 0xFF);
     SerialUSB.write(adc_value16[XY_Y] >>  0 & 0xFF);
         

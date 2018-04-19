@@ -355,10 +355,10 @@ inline void main_loop() { // as fast as possible
         if (0 < shotguncounter) {
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
-        SerialUSB.write((byte)0x00);
-        SerialUSB.write((byte)0x00);
+//        SerialUSB.write((byte)0x00);
+//        SerialUSB.write((byte)0x00);
         SerialUSB.write(adc_value16[shotgun[i]] >>  8 & 0xFF);
-        SerialUSB.write(adc_value16[shotgun[i]] >>  0 & 0xFF);
+        SerialUSB.write(adc_value16[shotgun[i]] & 0xFF);
         shotguncounter--;
         }
         break;
@@ -378,10 +378,10 @@ inline void main_loop() { // as fast as possible
         case 0xAC:
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
-        SerialUSB.write(modulation_data[shotgun[i]-0xA0] >> 24 & 0xFF);
-        SerialUSB.write(modulation_data[shotgun[i]-0xA0] >> 16 & 0xFF);
+//        SerialUSB.write(modulation_data[shotgun[i]-0xA0] >> 24 & 0xFF);
+//        SerialUSB.write(modulation_data[shotgun[i]-0xA0] >> 16 & 0xFF);
         SerialUSB.write(modulation_data[shotgun[i]-0xA0] >>  8 & 0xFF);
-        SerialUSB.write(modulation_data[shotgun[i]-0xA0] >>  0 & 0xFF);
+        SerialUSB.write(modulation_data[shotgun[i]-0xA0] & 0xFF);
       
         break;
         
@@ -389,7 +389,8 @@ inline void main_loop() { // as fast as possible
         if (0 < shotguncounter) {
         SerialUSB.write(0xFF);
         SerialUSB.write(0xF0);
-        SerialUSB.print("MMO3");
+//        SerialUSB.print("MMO3");
+        SerialUSB.print("M3");
         shotguncounter--;
         }
         break;
