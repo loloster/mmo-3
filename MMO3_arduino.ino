@@ -93,7 +93,8 @@ uint32_t dac_on;
   uint8_t compteur_cc = 0;
 
   // for incoming serial data  
-  int incomingByte = 0xFF;
+  byte incomingByte = 0xFF;
+  byte incomingByte1 = 0; //when receiving an argument to the command (for instance 0xF1 0xFF ie. slowing down loop 255x)
 
   // shotgun
   //const byte szshtgn=4;
@@ -157,8 +158,8 @@ void setup() {
   start_dac();
 
   #ifdef serialout
-    Serial.begin(9600);
-    //Serial.begin(57600);
+    //Serial.begin(9600);
+    Serial.begin(115200);
     //SerialUSB.begin(9600);
     //SerialUSB.begin(57600);
     SerialUSB.begin(115200);
@@ -236,9 +237,10 @@ inline void main_loop() { // as fast as possible
       Serial.print("I received: ");
       Serial.println(incomingByte, DEC);
       if ((incomingByte < 100) || (incomingByte == 0xF0) || (incomingByte == 0xF1) || (incomingByte == 0xF2)){
+        loopc=slowloop;
         shotguncounter=2;
         shotgun[0]=incomingByte;
-      } else if (incomingByte > 0)
+      } else //if (incomingByte > 0)
         if (incomingByte == 0xFF) /*for (i=0;i<szshtgn;i++)*/ {
           /*shotgun[i]=0xFF;*/
            shotgun[0]=0xFF;
@@ -399,7 +401,10 @@ inline void main_loop() { // as fast as possible
         if (0 < shotguncounter) {
           if (!(SerialUSB.available() > 0))
             slowloop++;
-            else slowloop = SerialUSB.read();
+            else {
+              incomingByte1 = SerialUSB.read();
+              slowloop += incomingByte1;
+            }
 
         Serial.print("Slowing down shotgun:");
         Serial.println(slowloop);
@@ -411,14 +416,16 @@ inline void main_loop() { // as fast as possible
         if (0 < shotguncounter) {
           if (!(SerialUSB.available() > 0))
             slowloop = (1 < slowloop) ? --slowloop : (shotgun[2] == 0xFF) ? 0 : 1;
-            else slowloop = SerialUSB.read();
+            else {
+              incomingByte1 = SerialUSB.read();
+              slowloop = (incomingByte1 < slowloop) ? (slowloop-incomingByte1) : (shotgun[2] == 0xFF) ? 0 : 1;
+            }
         
         Serial.print("Speeding up shotgun:");
         Serial.println(slowloop);
         shotguncounter=0;
         }
         break;
-
         }
       }
     }
