@@ -100,7 +100,9 @@ uint32_t dac_on;
   //const byte szshtgn=4;
   byte shotgun[4];
   uint8_t shotguncounter=2;
-  
+
+  uint32_t VCO1_out, VCO2_out, VCO3_out;
+
 #endif
 
 void setup() {
@@ -426,6 +428,42 @@ inline void main_loop() { // as fast as possible
         shotguncounter=0;
         }
         break;
+
+        case 0xF3:
+        SerialUSB.write(0xFF);
+        SerialUSB.write((byte)shotgun[i]);
+        SerialUSB.write(VCO1_out >>  8 & 0xFF);
+        SerialUSB.write(VCO1_out >>  0 & 0xFF);
+        break;
+
+        case 0xF4:
+        SerialUSB.write(0xFF);
+        SerialUSB.write((byte)shotgun[i]);
+        SerialUSB.write(VCO2_out >>  8 & 0xFF);
+        SerialUSB.write(VCO2_out >>  0 & 0xFF);
+        break;
+
+        case 0xF5:
+        SerialUSB.write(0xFF);
+        SerialUSB.write((byte)shotgun[i]);
+        SerialUSB.write(VCO3_out >>  8 & 0xFF);
+        SerialUSB.write(VCO3_out >>  0 & 0xFF);
+        break;
+
+        case 0xF6:
+        SerialUSB.write(0xFF);
+        SerialUSB.write((byte)shotgun[i]);
+        SerialUSB.write(audio_outR >>  8 & 0xFF);
+        SerialUSB.write(audio_outR >>  0 & 0xFF);
+        break;
+
+        case 0xF7:
+        SerialUSB.write(0xFF);
+        SerialUSB.write((byte)shotgun[i]);
+        SerialUSB.write(audio_outL >>  8 & 0xFF);
+        SerialUSB.write(audio_outL >>  0 & 0xFF);
+        break;
+
         }
       }
     }
@@ -441,7 +479,9 @@ void loop() {
 }
 
 inline void compute_audio_sample() {
+#ifndef serialout
   uint32_t VCO1_out, VCO2_out, VCO3_out, VCO4_out;
+#endif
   uint32_t ADSR_tmp;
   sound stereo;
   uint32_t modulation_type_local;  

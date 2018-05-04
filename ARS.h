@@ -79,22 +79,22 @@ enum adc_pos {
 };
 
 enum modulation_value {
-  mod_VCO1,
-  mod_VCO2,
-  mod_VCO3,
-  mod_LFO1,
-  mod_LFO2,
-  mod_LFO3,
-  mod_ADSR,
-  mod_EXT1, // mod "CV"
-  mod_LR, // mod "LINE IN"
-  mod_XY, // joystick
-  mod_L, // audio Left
-  mod_R,
-  mod_1,
-  mod_0, // not used, just to have 16 value in this list
-  mod_00,
-  mod_000
+  mod_VCO1,               //0xA0
+  mod_VCO2,               //0xA1
+  mod_VCO3,               //0xA2
+  mod_LFO1,               //0xA3
+  mod_LFO2,               //0xA4
+  mod_LFO3,               //0xA5
+  mod_ADSR,               //0xA6
+  mod_EXT1, // mod "CV"   //0xA7
+  mod_LR, // mod "LINE IN"//0xA8
+  mod_XY, // joystick     //0xA9
+  mod_L, // audio Left    //0xAA
+  mod_R,                  //0xAB
+  mod_1,                  //0xAC
+  mod_0, // not used, just to have 16 value in this list //0xAD
+  mod_00,                 //0xAE
+  mod_000                 //0xAF
 };
 
 enum modulation_adresse {
