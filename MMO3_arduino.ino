@@ -432,36 +432,36 @@ inline void main_loop() { // as fast as possible
         case 0xF3:
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
-        SerialUSB.write(VCO1_out >>  8 & 0xFF);
-        SerialUSB.write(VCO1_out >>  0 & 0xFF);
+        SerialUSB.write((VCO1_out / 65536) >>  8 & 0xFF);
+        SerialUSB.write((VCO1_out / 65536) >>  0 & 0xFF);
         break;
 
         case 0xF4:
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
-        SerialUSB.write(VCO2_out >>  8 & 0xFF);
-        SerialUSB.write(VCO2_out >>  0 & 0xFF);
+        SerialUSB.write((VCO2_out / 65536) >>  8 & 0xFF);
+        SerialUSB.write((VCO2_out >>  0 & 0xFF);
         break;
 
         case 0xF5:
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
-        SerialUSB.write(VCO3_out >>  8 & 0xFF);
-        SerialUSB.write(VCO3_out >>  0 & 0xFF);
+        SerialUSB.write((VCO3_out / 65536) >>  8 & 0xFF);
+        SerialUSB.write((VCO3_out / 65536) >>  0 & 0xFF);
         break;
 
         case 0xF6:
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
-        SerialUSB.write(audio_outR >>  8 & 0xFF);
-        SerialUSB.write(audio_outR >>  0 & 0xFF);
+        SerialUSB.write((audio_outR / 65536) >>  8 & 0xFF);
+        SerialUSB.write((audio_outR / 65536) >>  0 & 0xFF);
         break;
 
         case 0xF7:
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
-        SerialUSB.write(audio_outL >>  8 & 0xFF);
-        SerialUSB.write(audio_outL >>  0 & 0xFF);
+        SerialUSB.write((audio_outL / 65536) >>  8 & 0xFF);
+        SerialUSB.write((audio_outL / 65536) >>  0 & 0xFF);
         break;
 
         }
