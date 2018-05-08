@@ -472,6 +472,8 @@ inline void main_loop() { // as fast as possible
         Serial.print("Speeding up shotgun:");
         Serial.println(slowloop);
         shotguncounter=0;
+        } else {
+          shotgun[0]=0xFF;
         }
         break;
       }
