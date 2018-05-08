@@ -441,7 +441,7 @@ inline void keyboard_in() {
           break;
         }
       }
-      // Cas particulié
+      // Cas particulier
       // automodulation WS
       if ((KEY_ROWL1_tmp >  0) && (modulation_index[KEY_ROWL1_tmp-1] == mod_1) ) {
         modulation_index[KEY_ROWL1_tmp-1] = ((KEY_ROWL1_tmp-1) / 3); // si on a une modulation direct : on la vire. si besion, elle sera remise la ligne suivante
@@ -718,7 +718,7 @@ inline void keyboard_in() {
     
     KEY_old = KEY;
 
-  #ifdef serialout
+  //#ifdef serialout
     ////Serial.print("ONote/Note:");
     ////Serial.print(KEY_old);
     //Serial.print("Note:");
@@ -731,7 +731,7 @@ inline void keyboard_in() {
      //Serial.println(adc_value16[VCO1_FQ]);
     }
 */
-  #endif
+  //#endif
     
     break;
   }
@@ -741,10 +741,10 @@ inline void PORTAMENTO_update() {
   uint32_t tmp32;
   tmp32 = adc_value16[PORTAMENTO_VALUE];
   portamento = (table_CV2freq[0x350-(tmp32>>7)]);
-  #ifdef serialout
+  //#ifdef serialout
   ////Serial.write(0xA0);
   ////Serial.write(portamento);
-  #endif
+  //#endif
 }
 
 inline void PORTAMENTO() {

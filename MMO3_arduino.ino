@@ -98,7 +98,8 @@ uint32_t dac_on;
 
   // shotgun
   //const byte szshtgn=4;
-  byte shotgun[4];
+//  byte shotgun[4];
+  byte shotgun[6];
   uint8_t shotguncounter=2;
 
   uint32_t VCO1_out, VCO2_out, VCO3_out;
@@ -162,9 +163,11 @@ void setup() {
   #ifdef serialout
     //Serial.begin(9600);
     Serial.begin(115200);
+    //Serial.begin(230400);
     //SerialUSB.begin(9600);
     //SerialUSB.begin(57600);
     SerialUSB.begin(115200);
+    //SerialUSB.begin(230400);
   //SPI.begin(4);
     Serial.println("Hey! Hey!");
     Serial.println("MMO-3!");
@@ -249,24 +252,59 @@ inline void main_loop() { // as fast as possible
            shotgun[1]=0xFF;
            shotgun[2]=0xFF;
            shotgun[3]=0xFF;
+
+           //shotgun[4]=0xFF;
+           //shotgun[5]=0xFF;
+
            slowloop=0;
         }
         else { // setting up continuous dump messages
          if (incomingByte ==  shotgun[1]) {
           shotgun[1]=shotgun[2];
           shotgun[2]=shotgun[3];
+
+          //shotgun[3]=shotgun[4];
+          //shotgun[4]=shotgun[5];
+          //shotgun[5]=0xFF;
+
           shotgun[3]=0xFF;
          }
          else {
-          if (incomingByte == shotgun [2]) {
+          if (incomingByte == shotgun[2]) {
            shotgun[2]=shotgun[3];
+
+           //shotgun[3]=shotgun[4];
+           //shotgun[4]=shotgun[5];
+           //shotgun[5]=0xFF;
+
            shotgun[3]=0xFF;
           }
           else {
-           if (incomingByte == shotgun [3]) {
+           if (incomingByte == shotgun[3]) {
+
+            //shotgun[3]=shotgun[4];
+            //shotgun[4]=shotgun[5];
+            //shotgun[5]=0xFF;
+
             shotgun[3]=0xFF;
            }
+/*
            else {
+            if (incomingByte == shotgun[4]) {
+             shotgun[4]=shotgun[5];
+             shotgun[5]=0xFF;
+           }
+            else {
+             if (incomingByte == shotgun[5]) {
+              shotgun[5]=0xFF;
+            }
+*/
+
+
+           else {
+            //shotgun[5]=shotgun[4];
+            //shotgun[4]=shotgun[3];
+
             shotgun[3]=shotgun[2];
             shotgun[2]=shotgun[1];
             shotgun[1]=incomingByte;
@@ -275,6 +313,12 @@ inline void main_loop() { // as fast as possible
           }
          }
         }
+
+
+         //}
+        //}
+
+
         /*{ tmp32=0;
           for (i=1;i<szshtgn;i++) {
             if (incomingByte == shotgun[i]) {
@@ -322,6 +366,7 @@ inline void main_loop() { // as fast as possible
       //switch ((compteur_cc++ % 32)) {
       //for (i=0;i<szshtgn;i++){
       for (i=0;i<4;i++){
+      //for (i=0;i<6;i++){
         switch (shotgun[i]) {
       //switch (incomingByte) {
         case 0:
@@ -367,19 +412,19 @@ inline void main_loop() { // as fast as possible
         }
         break;
 
-        case 0xA0:
-        case 0xA1:
-        case 0xA2:
-        case 0xA3:
-        case 0xA4:
-        case 0xA5:
-        case 0xA6:
-        case 0xA7:
-        case 0xA8:
-        case 0xA9:
-        case 0xAA:
-        case 0xAB:
-        case 0xAC:
+        case 0xA0://OSC1 1
+        case 0xA1://OSC2 2
+        case 0xA2://OSC3 3
+        case 0xA3://LFO1 4
+        case 0xA4://LF02 5
+        case 0xA5://LFO3 6
+        case 0xA6://ADSR 7
+        case 0xA7://EXT1 CV 8
+        case 0xA8://lINE IN 9
+        case 0xA9://JOYSTICK 10
+        case 0xAA://Audio In Left 11
+        case 0xAB://Audio In Right 12
+        case 0xAC://Automodulation ?? 13
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
 //        SerialUSB.write(modulation_data[shotgun[i]-0xA0] >> 24 & 0xFF);
@@ -429,35 +474,35 @@ inline void main_loop() { // as fast as possible
         }
         break;
 
-        case 0xF3:
+        case 0xF3://17
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
         SerialUSB.write((VCO1_out / 65536) >>  8 & 0xFF);
         SerialUSB.write((VCO1_out / 65536) >>  0 & 0xFF);
         break;
 
-        case 0xF4:
+        case 0xF4://18
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
         SerialUSB.write((VCO2_out / 65536) >>  8 & 0xFF);
-        SerialUSB.write((VCO2_out >>  0 & 0xFF);
+        SerialUSB.write((VCO2_out / 65536) >>  0 & 0xFF);
         break;
 
-        case 0xF5:
+        case 0xF5://19
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
         SerialUSB.write((VCO3_out / 65536) >>  8 & 0xFF);
         SerialUSB.write((VCO3_out / 65536) >>  0 & 0xFF);
         break;
 
-        case 0xF6:
+        case 0xF6://20
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
         SerialUSB.write((audio_outR / 65536) >>  8 & 0xFF);
         SerialUSB.write((audio_outR / 65536) >>  0 & 0xFF);
         break;
 
-        case 0xF7:
+        case 0xF7://21
         SerialUSB.write(0xFF);
         SerialUSB.write((byte)shotgun[i]);
         SerialUSB.write((audio_outL / 65536) >>  8 & 0xFF);
@@ -467,7 +512,7 @@ inline void main_loop() { // as fast as possible
         }
       }
     }
-  }
+  }//end of "if (!(loopc++ < slowloop)){"
   #endif
   
   //analog_out_1((modulation_data[modulation_index[index_VCO1_MOD1]]<<16)^0x80000000);

@@ -55,62 +55,62 @@ inline void init_led() {
 
 
 inline void led1_on() {
-  #ifdef serialout
+  //#ifdef serialout
   //if (//Serial.availableForWrite()){
   // //Serial.println("led1_on");
   //}
-  #endif
+  //#endif
   PORTLED1->PIO_SODR =  1 << LED1;
 }
 
 inline void led1_off() {
-  #ifdef serialout
+  //#ifdef serialout
   //if (//Serial.availableForWrite()){
   // //Serial.println("led1_off");
   //}
-  #endif
+  //#endif
   PORTLED1->PIO_CODR =  1 << LED1;
 }
 
 inline void led_VCO1_on() {
-  #ifdef serialout
+  //#ifdef serialout
   //Serial.println("VCO1_on");
-  #endif
+  //#endif
   PORTLEDVCO1->PIO_SODR =  1 << LEDVCO1;
 }
 
 inline void led_VCO1_off() {
-  #ifdef serialout
+  //#ifdef serialout
   //Serial.println("VCO1_off");
-  #endif
+  //#endif
   PORTLEDVCO1->PIO_CODR =  1 << LEDVCO1;
 }
 
 inline void led_VCO2_on() {
-  #ifdef serialout
+  //#ifdef serialout
   //Serial.println("VCO2_on");
-  #endif
+  //#endif
   PORTLEDVCO2->PIO_SODR =  1 << LEDVCO2;
 }
 
 inline void led_VCO2_off() {
-  #ifdef serialout
+  //#ifdef serialout
   //Serial.println("VCO2_off");
-  #endif
+  //#endif
   PORTLEDVCO2->PIO_CODR =  1 << LEDVCO2;
 }
 
 inline void led_VCO3_on() {
-  #ifdef serialout
+  //#ifdef serialout
   //Serial.println("VCO3_on");
-  #endif
+  //#endif
   PORTLEDVCO3->PIO_SODR =  1 << LEDVCO3;
 }
 
 inline void led_VCO3_off() {
-  #ifdef serialout
+  //#ifdef serialout
   //Serial.println("VCO3_off");
-  #endif
+  //#endif
   PORTLEDVCO3->PIO_CODR =  1 << LEDVCO3;
 }
 
