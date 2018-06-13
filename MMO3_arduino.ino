@@ -99,7 +99,8 @@ uint32_t dac_on;
   // shotgun
   //const byte szshtgn=4;
 //  byte shotgun[4];
-  byte shotgun[6];
+  byte shotgun[5];
+//  byte shotgun[6];
   uint8_t shotguncounter=2;
 
   uint32_t VCO1_out, VCO2_out, VCO3_out;
@@ -118,6 +119,7 @@ void setup() {
     shotgun[1]=0xFF;
     shotgun[2]=0xFF;
     shotgun[3]=0xFF;
+    shotgun[4]=0xFF;//shtgnsz=5
   #endif
   
   REG_PMC_PCER0 = 1 << 11; // enable la clock du port PIO A pour les entree
@@ -251,9 +253,9 @@ inline void main_loop() { // as fast as possible
            shotgun[0]=0xFF;
            shotgun[1]=0xFF;
            shotgun[2]=0xFF;
-           shotgun[3]=0xFF;
+           shotgun[3]=0xFF;//shtgnsz=4
 
-           //shotgun[4]=0xFF;
+           shotgun[4]=0xFF;//shtgnsz=5
            //shotgun[5]=0xFF;
 
            slowloop=0;
@@ -264,13 +266,14 @@ inline void main_loop() { // as fast as possible
         else { // setting up continuous dump messages
          if (incomingByte ==  shotgun[1]) {
           shotgun[1]=shotgun[2];
-          shotgun[2]=shotgun[3];
+          shotgun[2]=shotgun[3];//shtgnsz=4
 
-          //shotgun[3]=shotgun[4];
+          shotgun[3]=shotgun[4];//shtgnsz=5
           //shotgun[4]=shotgun[5];
           //shotgun[5]=0xFF;
 
-          shotgun[3]=0xFF;
+          //shotgun[3]=0xFF;//shtgnsz=4
+          shotgun[4]=0xFF;//shtgnsz=5
 
 //          slowloop = ((slowloop == 1) && (shotgun[2] == 0xFF)) ? 0 : !(slowloop) ? 1 : slowloop;
 //          slowloop = (!(slowloop) && (shotgun[2] == 0xFF)) ? 0 : !(slowloop) ? 1 : slowloop;
@@ -281,30 +284,33 @@ inline void main_loop() { // as fast as possible
          }
          else {
           if (incomingByte == shotgun[2]) {
-           shotgun[2]=shotgun[3];
+           shotgun[2]=shotgun[3];//shtgnsz=4
 
-           //shotgun[3]=shotgun[4];
+           shotgun[3]=shotgun[4];//shtgnsz=5
            //shotgun[4]=shotgun[5];
            //shotgun[5]=0xFF;
 
-           shotgun[3]=0xFF;
+           //shotgun[3]=0xFF;//shtgnsz=4
+           shotgun[4]=0xFF;//shtgnsz=5
           }
           else {
            if (incomingByte == shotgun[3]) {
 
-            //shotgun[3]=shotgun[4];
+            shotgun[3]=shotgun[4];//shtgnsz=5
             //shotgun[4]=shotgun[5];
             //shotgun[5]=0xFF;
 
-            shotgun[3]=0xFF;
+            //shotgun[3]=0xFF;//shtgnsz=4
+            shotgun[4]=0xFF;//shtgnsz=5
            }
-/*
-           else {
+
+           else {//shtgnsz=5
             if (incomingByte == shotgun[4]) {
-             shotgun[4]=shotgun[5];
-             shotgun[5]=0xFF;
+             //shotgun[4]=shotgun[5];//shtgnsz=6
+             //shotgun[5]=0xFF;//shtgnsz=6
+             shotgun[4]=0xFF;//shtgnsz=5
            }
-            else {
+/*            else {
              if (incomingByte == shotgun[5]) {
               shotgun[5]=0xFF;
             }
@@ -313,9 +319,10 @@ inline void main_loop() { // as fast as possible
 
            else {
             //shotgun[5]=shotgun[4];
-            //shotgun[4]=shotgun[3];
+            
+            shotgun[4]=shotgun[3];//shtgnsz=5
 
-            shotgun[3]=shotgun[2];
+            shotgun[3]=shotgun[2];//shtgnsz=4
             shotgun[2]=shotgun[1];
             shotgun[1]=incomingByte;
 //            slowloop = ((slowloop == 1) && (shotgun[2] == 0xFF)) ? 0 : !(slowloop) ? 1 : slowloop;
@@ -327,11 +334,11 @@ inline void main_loop() { // as fast as possible
            }
           }
          }
-        }
+        }//shtgnsz=4
 
 
-         //}
-        //}
+         }//shtgnsz=5
+        //}//shtgnsz=6
 
 
         /*{ tmp32=0;
@@ -479,7 +486,8 @@ inline void main_loop() { // as fast as possible
       }
      }
 
-      for (i=1;i<4;i++){
+      //for (i=1;i<4;i++){//shtgnsz=4
+      for (i=1;i<5;i++){//shtgnsz=5
         switch (shotgun[i]) {
 
         case 0xA0://OSC1 1
